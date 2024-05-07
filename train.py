@@ -183,9 +183,9 @@ def validate(net, curr_iter, optimizer):
 if __name__ == '__main__':
     args = parse_args()
 
-    os.environ['CUDA_VISIBLE_DEVICES'] = args.gpus
-    cudnn.benchmark = True
-    torch.cuda.set_device(int(args.gpus))
+    # os.environ['CUDA_VISIBLE_DEVICES'] = args.gpus
+    # cudnn.benchmark = True
+    # torch.cuda.set_device(int(args.gpus))
 
     train_dataset = ItsDataset(TRAIN_ITS_ROOT, True, cfgs['crop_size'])
     train_loader = DataLoader(train_dataset, batch_size=cfgs['train_batch_size'], num_workers=4,

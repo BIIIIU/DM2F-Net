@@ -167,7 +167,7 @@ def validate(net, curr_iter, optimizer):
                 r = dehaze[i].cpu().numpy().transpose([1, 2, 0])  # data range [0, 1]
                 g = gt[i].cpu().numpy().transpose([1, 2, 0])
                 psnr = peak_signal_noise_ratio(g, r)
-                ssim = structural_similarity(g, r, data_range=1, multichannel=True,
+                ssim = structural_similarity(g, r, data_range=1, multichannel=True, channel_axis = 2,
                                              gaussian_weights=True, sigma=1.5, use_sample_covariance=False)
                 psnr_record.update(psnr)
                 ssim_record.update(ssim)
@@ -188,9 +188,9 @@ def validate(net, curr_iter, optimizer):
 if __name__ == '__main__':
     args = parse_args()
 
-    os.environ['CUDA_VISIBLE_DEVICES'] = args.gpus
-    cudnn.benchmark = True
-    torch.cuda.set_device(int(args.gpus))
+    # os.environ['CUDA_VISIBLE_DEVICES'] = args.gpus
+    # cudnn.benchmark = True
+    # torch.cuda.set_device(int(args.gpus))
 
     train_dataset = OHazeDataset(OHAZE_ROOT, 'train_crop_512')
     train_loader = DataLoader(train_dataset, batch_size=cfgs['train_batch_size'], num_workers=4,

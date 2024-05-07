@@ -13,23 +13,25 @@ from datasets import SotsDataset, OHazeDataset
 from torch.utils.data import DataLoader
 from skimage.metrics import peak_signal_noise_ratio, structural_similarity
 
-os.environ['CUDA_VISIBLE_DEVICES'] = '0'
+# os.environ['CUDA_VISIBLE_DEVICES'] = '0'
 
 torch.manual_seed(2018)
-torch.cuda.set_device(0)
+# torch.cuda.set_device(0)
 
 ckpt_path = './ckpt'
-# exp_name = 'RESIDE_ITS'
-exp_name = 'O-Haze'
+exp_name = 'RESIDE_ITS'
+# exp_name = 'O-Haze'
 
 args = {
     # 'snapshot': 'iter_40000_loss_0.01230_lr_0.000000',
-    'snapshot': 'iter_19000_loss_0.04261_lr_0.000014',
+    # 'snapshot': 'iter_19000_loss_0.04261_lr_0.000014',
+    'snapshot': 'iter_40000_loss_0.01244_lr_0.000000',
+    # 'snapshot': 'iter_16000_loss_0.05021_lr_0.000047',
 }
 
 to_test = {
-    # 'SOTS': TEST_SOTS_ROOT,
-    'O-Haze': OHAZE_ROOT,
+    'SOTS': TEST_SOTS_ROOT,
+    # 'O-Haze': OHAZE_ROOT,
 }
 
 to_pil = transforms.ToPILImage()
@@ -84,7 +86,7 @@ def main():
                     gt = gts[i].cpu().numpy().transpose([1, 2, 0])
                     psnr = peak_signal_noise_ratio(gt, r)
                     psnrs.append(psnr)
-                    ssim = structural_similarity(gt, r, data_range=1, multichannel=True,
+                    ssim = structural_similarity(gt, r, data_range=1, multichannel=True, channel_axis = 2,
                                                  gaussian_weights=True, sigma=1.5, use_sample_covariance=False)
                     ssims.append(ssim)
                     print('predicting for {} ({}/{}) [{}]: PSNR {:.4f}, SSIM {:.4f}'
