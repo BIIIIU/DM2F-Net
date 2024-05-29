@@ -10,7 +10,6 @@ The original repo can be found at [here](hhttps://github.com/zijundeng/DM2F-Net/
 ## Results
 
 <div style="text-align: center;">
-</style>
 <table class="tg"><thead>
   <tr>
     <th class="tg-9wq8">Dataset</th>
