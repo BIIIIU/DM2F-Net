@@ -9,11 +9,55 @@ The original repo can be found at [here](hhttps://github.com/zijundeng/DM2F-Net/
 
 ## Results
 
-|      Dataset      |   |     O-HAZE    |         |         |   |    HazeRD    |         |          |
-|:-----------------:|:-------:|:-------:|:-------:|:-------:|:-------:|:------:|:-------:|:--------:|
-|       Method      |   PSNR  |   SSIM  |   MSE   |  CIEDE  |   PSNR  |  SSIM  |   MSE   |   CIEDE  |
-|      DM2F-Net     | 25.113  | 0.7742  | 0.0032  | 5.2000  | 14.212  | 0.8145 | 0.0724  | 16.8331  |
-| DM2F-Net-improved | 25.602  | 0.7752  |  0.0030 |  4.9714 | 15.774  | 0.8291 | 0.0589  | 15.5905  |
+<style type="text/css">
+.tg  {border-collapse:collapse;border-spacing:0;}
+.tg td{border-color:black;border-style:solid;border-width:1px;font-family:Arial, sans-serif;font-size:14px;
+  overflow:hidden;padding:10px 5px;word-break:normal;}
+.tg th{border-color:black;border-style:solid;border-width:1px;font-family:Arial, sans-serif;font-size:14px;
+  font-weight:normal;overflow:hidden;padding:10px 5px;word-break:normal;}
+.tg .tg-9wq8{border-color:inherit;text-align:center;vertical-align:middle}
+</style>
+<table class="tg"><thead>
+  <tr>
+    <th class="tg-9wq8">Dataset</th>
+    <th class="tg-9wq8" colspan="4">O-HAZE</th>
+    <th class="tg-9wq8" colspan="4">HazeRD</th>
+  </tr></thead>
+<tbody>
+  <tr>
+    <td class="tg-9wq8">Method</td>
+    <td class="tg-9wq8">PSNR</td>
+    <td class="tg-9wq8">SSIM</td>
+    <td class="tg-9wq8">MSE</td>
+    <td class="tg-9wq8">CIEDE</td>
+    <td class="tg-9wq8">PSNR</td>
+    <td class="tg-9wq8">SSIM</td>
+    <td class="tg-9wq8">MSE</td>
+    <td class="tg-9wq8">CIEDE</td>
+  </tr>
+  <tr>
+    <td class="tg-9wq8">DM2F-Net</td>
+    <td class="tg-9wq8">25.113 </td>
+    <td class="tg-9wq8">0.7742 </td>
+    <td class="tg-9wq8">0.0032 </td>
+    <td class="tg-9wq8">5.2000 </td>
+    <td class="tg-9wq8">14.212 </td>
+    <td class="tg-9wq8">0.8145</td>
+    <td class="tg-9wq8">0.0724 </td>
+    <td class="tg-9wq8">16.8331 </td>
+  </tr>
+  <tr>
+    <td class="tg-9wq8">DM2F-Net-improved</td>
+    <td class="tg-9wq8">25.602 </td>
+    <td class="tg-9wq8">0.7752 </td>
+    <td class="tg-9wq8">0.0030</td>
+    <td class="tg-9wq8">4.9714</td>
+    <td class="tg-9wq8">15.774 </td>
+    <td class="tg-9wq8">0.8291</td>
+    <td class="tg-9wq8">0.0589 </td>
+    <td class="tg-9wq8">15.5905 </td>
+  </tr>
+</tbody></table>
 
 The checkpoint and dehazing results can be found at 
 [Baidu Drive](https://pan.baidu.com/s/1Zh7siyQrjsRPuL0-MMSoVg?pwd=5fzu).
