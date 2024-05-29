@@ -9,8 +9,7 @@ from torchvision import transforms
 from tools.config import TEST_SOTS_ROOT, OHAZE_ROOT, TEST_HAZERD_ROOT, TEST_SELF_ROOT
 from tools.utils import AvgMeter, check_mkdir, sliding_forward
 from model import DM2FNet, DM2FNet_woPhy, DM2FNet_new
-from model_improve import DM2FNet_woPhy_new, DM2FNet_attention_in, DM2FNet_new2, ours_wo_AFIM, DM2FNet_attention_chuan, DM2FNet_woPhy_attention_chuan, DM2FNet_woPhy_woAFIM
-from model_improve2 import DM2FNet_plus_attention
+from model_improve import DM2FNet_woPhy_new, DM2FNet_new2
 from datasets import SotsDataset, OHazeDataset, HazeRDDataset, myDataset
 from torch.utils.data import DataLoader
 from skimage.metrics import peak_signal_noise_ratio, structural_similarity, mean_squared_error
@@ -39,14 +38,7 @@ exp_name = 'RESIDE_ITS_DM2FNet_new2_2'
 # exp_name = 'O-Haze_DM2FNet_woPhy_attention_chuan'
 
 args = {
-    # 'snapshot': 'iter_40000_loss_0.01230_lr_0.000000',
-    # 'snapshot': 'iter_19000_loss_0.04261_lr_0.000014',
-    # 'snapshot': 'iter_40000_loss_0.01241_lr_0.000000',
-    # 'snapshot': 'iter_20000_loss_0.04922_lr_0.000000',
     'snapshot': 'iter_50000_loss_0.01293_lr_0.000000',
-    # 'snapshot': 'iter_1000_loss_0.07267_lr_0.000000',
-    # 'snapshot': 'iter_40000_loss_0.01244_lr_0.000000',
-    # 'snapshot': 'iter_20000_loss_0.04862_lr_0.000000',
 }
 
 to_test = {
@@ -65,22 +57,20 @@ def main():
 
         for name, root in to_test.items():
             if 'SOTS' in name:
-                net = ours_wo_AFIM().cuda()
+                net = DM2FNet_new2().cuda()
                 dataset = SotsDataset(root)
             elif 'O-Haze' in name:
-                net = DM2FNet_woPhy_woAFIM().cuda()
+                net = DM2FNet_woPhy_new().cuda()
                 dataset = OHazeDataset(root, 'test')
             elif 'HazeRD' in name:
-                net = DM2FNet_attention_in().cuda()
+                net = DM2FNet_new2().cuda()
                 dataset = HazeRDDataset(root)
             elif 'self' in name:
                 net = DM2FNet_new2().cuda()
                 dataset = myDataset(root)
             else:
                 raise NotImplementedError
-
-            # net = nn.DataParallel(net)
-
+            
             if len(args['snapshot']) > 0:
                 print('load snapshot \'%s\' for testing' % args['snapshot'])
                 net.load_state_dict(torch.load(os.path.join(ckpt_path, exp_name, args['snapshot'] + '.pth')))
@@ -110,8 +100,6 @@ def main():
                     to_pil(r).save(
                         os.path.join(ckpt_path, exp_name,
                                      '(%s) %s_%s' % (exp_name, name, args['snapshot']), '%s.png' % f))
-
-            
 
 if __name__ == '__main__':
     main()

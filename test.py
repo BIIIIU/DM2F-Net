@@ -8,14 +8,15 @@ from torchvision import transforms
 
 from tools.config import TEST_SOTS_ROOT, OHAZE_ROOT, TEST_HAZERD_ROOT
 from tools.utils import AvgMeter, check_mkdir, sliding_forward
-from model import DM2FNet, DM2FNet_woPhy
+from model import DM2FNet, DM2FNet_woPhy, ours_wo_AFIM
+from model_improve import DM2FNet_new2, DM2FNet_woPhy_new #improved model
+from model_improve import DM2FNet_woPhy_woAFIM
+from model_improve import DM2FNet_attention_chuan, DM2FNet_woPhy_attention_chuan
 from datasets import SotsDataset, OHazeDataset, HazeRDDataset
 from torch.utils.data import DataLoader
 from skimage.metrics import peak_signal_noise_ratio, structural_similarity, mean_squared_error
-from pyciede2000 import ciede2000
-from deltae2000 import delta_e_cie2000
-from colormath.color_conversions import convert_color
-from colormath.color_objects import sRGBColor, LabColor
+from model_mix import MixDehazeNet_s
+from skimage.color import rgb2lab, deltaE_ciede2000
 
 # os.environ['CUDA_VISIBLE_DEVICES'] = '0'
 
@@ -23,20 +24,20 @@ torch.manual_seed(2018)
 # torch.cuda.set_device(0)
 
 ckpt_path = './ckpt'
-exp_name = 'RESIDE_ITS'
+# exp_name = 'RESIDE_ITS'
+# exp_name = 'RESIDE_ITS_DM2FNet_new2'
 # exp_name = 'O-Haze'
+exp_name = 'O-Haze_improve'
 
 args = {
-    # 'snapshot': 'iter_40000_loss_0.01230_lr_0.000000',
-    # 'snapshot': 'iter_19000_loss_0.04261_lr_0.000014',
-    'snapshot': 'iter_40000_loss_0.01244_lr_0.000000',
-    # 'snapshot': 'iter_16000_loss_0.05021_lr_0.000047',
+    'snapshot': 'iter_20000_loss_0.04922_lr_0.000000',
+    # 'snapshot': 'iter_40000_loss_0.01398_lr_0.000000',
 }
 
 to_test = {
     # 'SOTS': TEST_SOTS_ROOT,
-    # 'O-Haze': OHAZE_ROOT,
-    'HazeRD': TEST_HAZERD_ROOT,
+    'O-Haze': OHAZE_ROOT,
+    # 'HazeRD': TEST_HAZERD_ROOT,
 }
 
 to_pil = transforms.ToPILImage()
@@ -48,13 +49,13 @@ def main():
 
         for name, root in to_test.items():
             if 'SOTS' in name:
-                net = DM2FNet().cuda()
+                net = DM2FNet_new2().cuda()
                 dataset = SotsDataset(root)
             elif 'O-Haze' in name:
-                net = DM2FNet_woPhy().cuda()
+                net = DM2FNet_woPhy_new().cuda()
                 dataset = OHazeDataset(root, 'test')
             elif 'HazeRD' in name:
-                net = DM2FNet().cuda()
+                net = DM2FNet_new2().cuda()
                 dataset = HazeRDDataset(root)
             else:
                 raise NotImplementedError
@@ -68,7 +69,7 @@ def main():
             net.eval()
             dataloader = DataLoader(dataset, batch_size=1)
 
-            psnrs, ssims = [], []
+            psnrs, ssims, mses, ciede2000s = [], [], [], []
             loss_record = AvgMeter()
 
             for idx, data in enumerate(dataloader):
@@ -99,17 +100,30 @@ def main():
                     ssims.append(ssim)
                     print('predicting for {} ({}/{}) [{}]: PSNR {:.4f}, SSIM {:.4f}'
                           .format(name, idx + 1, len(dataloader), fs[i], psnr, ssim))
+                    mse = mean_squared_error(gt, r)
+                    mses.append(mse)
+                    lab_r = rgb2lab(r)
+                    lab_gt = rgb2lab(gt)
+                    ciede2000 = deltaE_ciede2000(lab_gt, lab_r)
+                    ciede2000s.append(ciede2000.mean())
+                    print('predicting for {} ({}/{}) [{}]: MSE {:.4f}'
+                          .format(name, idx + 1, len(dataloader), fs[i], mse))
+                    print('predicting for {} ({}/{}) [{}]: CIEDE2000 {:.4f}'
+                            .format(name, idx + 1, len(dataloader), fs[i], ciede2000.mean()))
 
                 for r, f in zip(res.cpu(), fs):
                     to_pil(r).save(
                         os.path.join(ckpt_path, exp_name,
                                      '(%s) %s_%s' % (exp_name, name, args['snapshot']), '%s.png' % f))
+                
 
             print(f"[{name}] L1: {loss_record.avg:.6f}, PSNR: {np.mean(psnrs):.6f}, SSIM: {np.mean(ssims):.6f}")
-            #save to txt in os.path.join(ckpt_path, exp_name,'(%s) %s_%s' % (exp_name, name, args['snapshot']))
+            print(f"[{name}] MSE: {np.mean(mses):.6f}")
+            print(f"[{name}] CIEDE2000: {np.mean(ciede2000s):.6f}")
             with open(os.path.join(ckpt_path, exp_name,'(%s) %s_%s' % (exp_name, name, args['snapshot']), 'result.txt'), 'w') as f:
-                f.write(f"L1: {loss_record.avg:.6f}, PSNR: {np.mean(psnrs):.6f}, SSIM: {np.mean(ssims):.6f}")
-
+                f.write(f"L1: {loss_record.avg:.6f}, PSNR: {np.mean(psnrs):.6f}, SSIM: {np.mean(ssims):.6f}\n")
+                f.write(f"MSE: {np.mean(mses):.6f}\n")
+                f.write(f"CIEDE2000: {np.mean(ciede2000s):.6f}\n")
 
 if __name__ == '__main__':
     main()

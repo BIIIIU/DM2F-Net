@@ -12,6 +12,7 @@ from torch.utils.data import DataLoader
 import torch.cuda.amp as amp
 
 from model import DM2FNet_woPhy
+from model_improve import DM2FNet_woPhy_new, DM2FNet_woPhy_attention_chuan
 from tools.config import OHAZE_ROOT
 from datasets import OHazeDataset
 from tools.utils import AvgMeter, check_mkdir, sliding_forward

@@ -11,6 +11,7 @@ from torch.backends import cudnn
 from torch.utils.data import DataLoader
 
 from model import DM2FNet
+from model_improve import DM2FNet_new2
 from tools.config import TRAIN_ITS_ROOT, TEST_SOTS_ROOT
 from datasets import ItsDataset, SotsDataset
 from tools.utils import AvgMeter, check_mkdir
@@ -25,7 +26,7 @@ def parse_args():
     parser.add_argument('--ckpt-path', default='./ckpt', help='checkpoint path')
     parser.add_argument(
         '--exp-name',
-        default='RESIDE_ITS',
+        default='RESIDE_ITS_DM2FNet_new2',
         help='experiment name.')
     args = parser.parse_args()
 
@@ -48,7 +49,7 @@ cfgs = {
 
 
 def main():
-    net = DM2FNet().cuda().train()
+    net = DM2FNet_new2().cuda().train()
     # net = nn.DataParallel(net)
 
     optimizer = optim.Adam([
