@@ -9,13 +9,7 @@ The original repo can be found at [here](hhttps://github.com/zijundeng/DM2F-Net/
 
 ## Results
 
-<style type="text/css">
-.tg  {border-collapse:collapse;border-spacing:0;}
-.tg td{border-color:black;border-style:solid;border-width:1px;font-family:Arial, sans-serif;font-size:14px;
-  overflow:hidden;padding:10px 5px;word-break:normal;}
-.tg th{border-color:black;border-style:solid;border-width:1px;font-family:Arial, sans-serif;font-size:14px;
-  font-weight:normal;overflow:hidden;padding:10px 5px;word-break:normal;}
-.tg .tg-9wq8{border-color:inherit;text-align:center;vertical-align:middle}
+<div style="text-align: center;">
 </style>
 <table class="tg"><thead>
   <tr>
@@ -58,6 +52,7 @@ The original repo can be found at [here](hhttps://github.com/zijundeng/DM2F-Net/
     <td class="tg-9wq8">15.5905 </td>
   </tr>
 </tbody></table>
+</div>
 
 The checkpoint and dehazing results can be found at 
 [Baidu Drive](https://pan.baidu.com/s/1Zh7siyQrjsRPuL0-MMSoVg?pwd=5fzu).
