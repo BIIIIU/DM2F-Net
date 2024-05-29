@@ -10,6 +10,7 @@ import torch
 import torch.utils.data as data
 from torchvision import transforms
 from torchvision.transforms import ToTensor
+import cv2
 
 to_tensor = ToTensor()
 
@@ -190,6 +191,52 @@ class ItsDataset(data.Dataset):
 
     def __len__(self):
         return len(self.imgs)
+    
+def hwc_to_chw(img):
+	return np.transpose(img, axes=[2, 0, 1])
+
+def chw_to_hwc(img):
+	return np.transpose(img, axes=[1, 2, 0])
+
+class ItsDataset_mix(data.Dataset):
+    """
+    For RESIDE Indoor
+    """
+
+    def __init__(self, root, flip=False, crop=None):
+        self.root = root
+        self.imgs = make_dataset_its(root)
+        self.flip = flip
+        self.crop = crop
+
+    def __getitem__(self, index):
+        haze_path, trans_path, ato, gt_path = self.imgs[index]
+        name = os.path.splitext(os.path.split(haze_path)[1])[0]
+
+        haze = cv2.imread(haze_path)
+        trans = cv2.imread(trans_path)
+        gt = cv2.imread(gt_path)
+
+        assert haze.size == trans.size
+        assert trans.size == gt.size
+
+        if self.crop:
+            haze, gt, trans = random_crop(self.crop, haze, gt, trans)
+
+        if self.flip and random.random() < 0.5:
+            haze = haze.transpose(Image.FLIP_LEFT_RIGHT)
+            trans = trans.transpose(Image.FLIP_LEFT_RIGHT)
+            gt = gt.transpose(Image.FLIP_LEFT_RIGHT)
+
+        haze = to_tensor(haze)
+        trans = to_tensor(trans)
+        gt = to_tensor(gt)
+        gt_ato = torch.Tensor([ato]).float()
+
+        return hwc_to_chw(haze), trans, gt_ato, hwc_to_chw(gt), name
+
+    def __len__(self):
+        return len(self.imgs)
 
 
 class OtsDataset(data.Dataset):
@@ -227,6 +274,26 @@ class OtsDataset(data.Dataset):
     def __len__(self):
         return len(self.imgs)
 
+class myDataset(data.Dataset):
+    def __init__(self, root, mode=None):
+        self.root = root
+        self.imgs = []
+        for img_name in os.listdir(root):
+            self.imgs.append(img_name)
+        self.mode = mode
+
+    def __getitem__(self, index):
+        haze_path = os.path.join(self.root, self.imgs[index])
+        name = os.path.splitext(os.path.split(haze_path)[1])[0]
+
+        haze = Image.open(haze_path).convert('RGB')
+        haze = to_tensor(haze)
+
+        return haze, name
+    
+    def __len__(self):
+        return len(self.imgs)
+
 
 class SotsDataset(data.Dataset):
     def __init__(self, root, mode=None):
@@ -249,6 +316,31 @@ class SotsDataset(data.Dataset):
             gt = gt[:, 10: 470, 10: 630]
 
         return haze, gt, name
+
+    def __len__(self):
+        return len(self.imgs)
+    
+class SotsDataset_mix(data.Dataset):
+    def __init__(self, root, mode=None):
+        self.root = root
+        self.imgs = make_dataset(root)
+        self.mode = mode
+
+    def __getitem__(self, index):
+        haze_path, trans_path, gt_path = self.imgs[index]
+        name = os.path.splitext(os.path.split(haze_path)[1])[0]
+
+        haze = Image.open(haze_path).convert('RGB')
+        haze = to_tensor(haze)
+
+        idx0 = name.split('_')[0]
+        gt = Image.open(os.path.join(self.root, 'gt', idx0 + '.png')).convert('RGB')
+        gt = to_tensor(gt)
+        if gt.shape != haze.shape:
+            # crop the indoor images
+            gt = gt[:, 10: 470, 10: 630]
+
+        return hwc_to_chw(haze), hwc_to_chw(gt), name
 
     def __len__(self):
         return len(self.imgs)
@@ -561,6 +653,36 @@ class ImageFolder3(data.Dataset):
         haze = Image.open(haze_path).convert('RGB')
         haze = to_tensor(haze)
         return haze, name
+
+    def __len__(self):
+        return len(self.imgs)
+
+def make_dataset_hazerd(root):
+    img_list = []
+    for img_name in os.listdir(os.path.join(root, 'simu')):
+        #IMG_7033_50.jpg -> IMG_7033_RGB.jpg
+        if img_name[-4:] != '.jpg':
+            continue
+        gt_name = img_name[: 9] + 'RGB.jpg'
+        img_list.append([os.path.join(root, 'simu', img_name),
+                         os.path.join(root, 'img', gt_name)])
+    return img_list
+
+class HazeRDDataset(data.Dataset):
+    def __init__(self, root):
+        self.root = root
+        self.imgs = make_dataset_hazerd(root)
+
+    def __getitem__(self, index):
+        haze_path, gt_path = self.imgs[index]
+        name = os.path.splitext(os.path.split(haze_path)[1])[0]
+
+        haze = Image.open(haze_path).convert('RGB')
+        gt = Image.open(gt_path).convert('RGB')
+
+        haze = to_tensor(haze)
+        gt = to_tensor(gt)
+        return haze, gt, name
 
     def __len__(self):
         return len(self.imgs)

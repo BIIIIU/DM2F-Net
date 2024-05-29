@@ -1,15 +1,22 @@
-# DM2F-Net
+# DM2F-Net-improved
 
-By Zijun Deng, Lei Zhu, Xiaowei Hu, Chi-Wing Fu, Xuemiao Xu, Qing Zhang, Jing Qin, and Pheng-Ann Heng.
+By Yuqi Zhang
 
-This repo is the implementation of
+This repo is an improvement of
 "[Deep Multi-Model Fusion for Single-Image Dehazing](https://openaccess.thecvf.com/content_ICCV_2019/papers/Deng_Deep_Multi-Model_Fusion_for_Single-Image_Dehazing_ICCV_2019_paper.pdf)"
 (ICCV 2019), written by Zijun Deng at the South China University of Technology.
+The original repo can be found at [here](hhttps://github.com/zijundeng/DM2F-Net/tree/master).
 
 ## Results
 
-The dehazing results can be found at 
-[Google Drive](https://drive.google.com/drive/folders/1ZVBI_3Y2NthVLeK7ODMIB5vRjmN9payF?usp=sharing).
+|      Dataset      |   |     O-HAZE    |         |         |   |    HazeRD    |         |          |
+|:-----------------:|:-------:|:-------:|:-------:|:-------:|:-------:|:------:|:-------:|:--------:|
+|       Method      |   PSNR  |   SSIM  |   MSE   |  CIEDE  |   PSNR  |  SSIM  |   MSE   |   CIEDE  |
+|      DM2F-Net     | 25.113  | 0.7742  | 0.0032  | 5.2000  | 14.212  | 0.8145 | 0.0724  | 16.8331  |
+| DM2F-Net-improved | 25.602  | 0.7752  |  0.0030 |  4.9714 | 15.774  | 0.8291 | 0.0589  | 15.5905  |
+
+The checkpoint and dehazing results can be found at 
+[Baidu Drive](https://pan.baidu.com/s/1Zh7siyQrjsRPuL0-MMSoVg?pwd=5fzu).
 
 ## Installation & Preparation
 
@@ -22,9 +29,9 @@ Make sure you have `Python>=3.7` installed on your machine.
        conda create -n dm2f
        conda activate dm2f
 
-2. Install dependencies (test with PyTorch 1.8.0):
+2. Install dependencies (test with PyTorch 2.3.0):
 
-   1. Install pytorch==1.8.0 torchvision==0.9.0 (via conda, recommend).
+   1. Install pytorch==2.3.0 torchvision==0.18.0 
 
    2. Install other dependencies
 
@@ -40,20 +47,15 @@ Make sure you have `Python>=3.7` installed on your machine.
 
 ## Training
 
-1. ~~Set the path of pretrained ResNeXt model in resnext/config.py~~
-2. Set the path of datasets in tools/config.py
-3. Run by ```python train.py```
-
-~~The pretrained ResNeXt model is ported from the [official](https://github.com/facebookresearch/ResNeXt) torch version,
-using the [convertor](https://github.com/clcarwin/convert_torch_to_pytorch) provided by clcarwin. 
-You can directly [download](https://drive.google.com/open?id=1dnH-IHwmu9xFPlyndqI6MfF4LvH6JKNQ) the pretrained model ported by me.~~
+1. Set the path of datasets in tools/config.py
+2. Run by ```python train.py```
 
 Use pretrained ResNeXt (resnext101_32x8d) from torchvision.
 
 *Hyper-parameters* of training were set at the top of *train.py*, and you can conveniently
 change them as you need.
 
-Training a model on a single ~~GTX 1080Ti~~ TITAN RTX GPU takes about ~~4~~ 5 hours.
+Training a model on a single NVIDIA A100 GPU takes about 4 hours.
 
 ## Testing
 
@@ -66,18 +68,9 @@ change them as you need.
 
 ## License
 
-DM2F-Net is released under the [MIT license](LICENSE).
+DM2F-Net-improved is released under the [MIT license](LICENSE).
 
 ## Citation
 
-If you find the paper or the code helpful to your research, please cite the project.
+If you find the code helpful to your research, please give a star to me!
 
-```
-@inproceedings{deng2019deep,
-  title={Deep multi-model fusion for single-image dehazing},
-  author={Deng, Zijun and Zhu, Lei and Hu, Xiaowei and Fu, Chi-Wing and Xu, Xuemiao and Zhang, Qing and Qin, Jing and Heng, Pheng-Ann},
-  booktitle={Proceedings of the IEEE/CVF International Conference on Computer Vision},
-  pages={2453--2462},
-  year={2019}
-}
-```

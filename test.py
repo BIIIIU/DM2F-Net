@@ -6,12 +6,16 @@ import torch
 from torch import nn
 from torchvision import transforms
 
-from tools.config import TEST_SOTS_ROOT, OHAZE_ROOT
+from tools.config import TEST_SOTS_ROOT, OHAZE_ROOT, TEST_HAZERD_ROOT
 from tools.utils import AvgMeter, check_mkdir, sliding_forward
 from model import DM2FNet, DM2FNet_woPhy
-from datasets import SotsDataset, OHazeDataset
+from datasets import SotsDataset, OHazeDataset, HazeRDDataset
 from torch.utils.data import DataLoader
-from skimage.metrics import peak_signal_noise_ratio, structural_similarity
+from skimage.metrics import peak_signal_noise_ratio, structural_similarity, mean_squared_error
+from pyciede2000 import ciede2000
+from deltae2000 import delta_e_cie2000
+from colormath.color_conversions import convert_color
+from colormath.color_objects import sRGBColor, LabColor
 
 # os.environ['CUDA_VISIBLE_DEVICES'] = '0'
 
@@ -30,8 +34,9 @@ args = {
 }
 
 to_test = {
-    'SOTS': TEST_SOTS_ROOT,
+    # 'SOTS': TEST_SOTS_ROOT,
     # 'O-Haze': OHAZE_ROOT,
+    'HazeRD': TEST_HAZERD_ROOT,
 }
 
 to_pil = transforms.ToPILImage()
@@ -48,6 +53,9 @@ def main():
             elif 'O-Haze' in name:
                 net = DM2FNet_woPhy().cuda()
                 dataset = OHazeDataset(root, 'test')
+            elif 'HazeRD' in name:
+                net = DM2FNet().cuda()
+                dataset = HazeRDDataset(root)
             else:
                 raise NotImplementedError
 
@@ -98,6 +106,9 @@ def main():
                                      '(%s) %s_%s' % (exp_name, name, args['snapshot']), '%s.png' % f))
 
             print(f"[{name}] L1: {loss_record.avg:.6f}, PSNR: {np.mean(psnrs):.6f}, SSIM: {np.mean(ssims):.6f}")
+            #save to txt in os.path.join(ckpt_path, exp_name,'(%s) %s_%s' % (exp_name, name, args['snapshot']))
+            with open(os.path.join(ckpt_path, exp_name,'(%s) %s_%s' % (exp_name, name, args['snapshot']), 'result.txt'), 'w') as f:
+                f.write(f"L1: {loss_record.avg:.6f}, PSNR: {np.mean(psnrs):.6f}, SSIM: {np.mean(ssims):.6f}")
 
 
 if __name__ == '__main__':

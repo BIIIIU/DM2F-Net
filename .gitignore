@@ -3,4 +3,6 @@ __pycache__/
 .idea
 ckpt
 data
-tmp.log
+*.log
+*.sh
+MixDehazeNet

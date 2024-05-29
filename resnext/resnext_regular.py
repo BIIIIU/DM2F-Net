@@ -3,6 +3,7 @@ from torch import nn
 
 from . import resnext_101_32x4d_
 from .config import resnext_101_32_path
+import torchvision.models as models
 
 
 class ResNeXt101(nn.Module):
@@ -16,7 +17,8 @@ class ResNeXt101(nn.Module):
         net = mode_dict[mode].resnext_101_32x4d
 
         if pretrained:
-            net.load_state_dict(torch.load(resnext_101_32_path))
+            net = models.__dict__['resnext101_32x8d'](pretrained=True)
+            # net.load_state_dict(torch.load(resnext_101_32_path))
         net = list(net.children())
         self.layer0 = nn.Sequential(*net[:3])
         self.layer1 = nn.Sequential(*net[3: 5])
